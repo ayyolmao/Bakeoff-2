@@ -139,6 +139,9 @@ void scaffoldControlLogic()
     float adjMouseX = mouseX - (width / 2);
     float adjMouseY = mouseY - (height / 2);
 
+    // visualizeMousePoint();
+    // println("mouseInLogoSquare: " + mouseInLogoSquare(adjMouseX, adjMouseY));
+
     if (mousePressed && !mouseFirstPressed) {
         mouseFirstPressed = true;
         if (mouseInLogoSquare(adjMouseX, adjMouseY)) {
@@ -156,14 +159,51 @@ void scaffoldControlLogic()
 }
 
 boolean mouseInLogoSquare(float adjMouseX, float adjMouseY) {
-    /*println("logo:        (" + logoX + ", " + logoY + ")");
-    println("logoZ:       " + logoZ);
-    println("logo bounds: ([" + (logoX - logoZ) + ", " + (logoX + logoZ) + "], [" + (logoY - logoZ) + ", " + (logoY + logoZ) + "])");
-    println("mouse:       (" + mouseX + ", " + mouseY + ")");*/
+    // println("logo:        (" + logoX + ", " + logoY + ")");
+    // println("logoZ:       " + -1.f * halfZ);
+    // println("logo bounds: ([" + (logoX - logoZ) + ", " + (logoX + logoZ) + "], [" + (logoY - logoZ) + ", " + (logoY + logoZ) + "])");
 
     float halfZ = logoZ / 2;
 
-    return adjMouseX >= logoX - halfZ && adjMouseX <= logoX + halfZ && adjMouseY >= logoY - halfZ && adjMouseY <= logoY + halfZ;
+    float mouseVecX = adjMouseX - logoX;
+    float mouseVecY = adjMouseY - logoY;
+
+    float oppLogoRotRads = - radians(logoRotation);
+    // println("logoRotation: " + logoRotation);
+
+    float rotMouseX = cos(oppLogoRotRads) * mouseVecX - sin(oppLogoRotRads) * mouseVecY;
+    float rotMouseY = sin(oppLogoRotRads) * mouseVecX + cos(oppLogoRotRads) * mouseVecY;
+    circle((width / 2) + logoX + rotMouseX,(height / 2) + logoY + rotMouseY, 5);
+
+    return rotMouseX >= - 1.f * halfZ && rotMouseX <= halfZ && rotMouseY >= - 1.f * halfZ && rotMouseY <= halfZ;
+}
+
+void visualizeMousePoint() {
+    float adjMouseX = mouseX - (width / 2);
+    float adjMouseY = mouseY - (height / 2);
+
+    float halfZ = logoZ / 2;
+
+    float mouseVecX = adjMouseX - logoX;
+    float mouseVecY = adjMouseY - logoY;
+
+    float oppLogoRotRads = - radians(logoRotation);
+
+    float rotMouseX = cos(oppLogoRotRads) * mouseVecX - sin(oppLogoRotRads) * mouseVecY;
+    float rotMouseY = sin(oppLogoRotRads) * mouseVecX + cos(oppLogoRotRads) * mouseVecY;
+    circle(width / 2 + logoX + rotMouseX, height / 2 + logoY + rotMouseY, 5);
+
+    println("rot mouse: (" + rotMouseX + ", " + rotMouseY + ")");
+    println("logoZ:     [" + ( - 1.f * halfZ) + ", " + halfZ + "]");
+
+    pushMatrix();
+    translate(width / 2, height / 2); //center the drawing coordinates to the center of the screen
+    translate(logoX, logoY);
+    // rotate(radians(logoRotation));
+    noStroke();
+    fill(255, 0, 0, 100);
+    rect(0, 0, logoZ, logoZ);
+    popMatrix();
 }
 
 void mousePressed()
@@ -182,15 +222,15 @@ void mouseReleased()
     /* if (dist(width / 2, height / 2, mouseX, mouseY)<inchToPix(3f))
     {
     if (userDone == false && !checkForSuccess())
-     errorCount++;
+    errorCount++;
 
     trialIndex++; //and move on to next trial
 
     if (trialIndex == trialCount && userDone == false)
     {
-     userDone = true;
-     finishTime = millis();
- }
+    userDone = true;
+    finishTime = millis();
+}
 } */
     mouseFirstPressed = false;
     mouseMove = false;

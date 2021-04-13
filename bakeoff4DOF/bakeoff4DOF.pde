@@ -108,7 +108,11 @@ void draw() {
     translate(logoX, logoY);
     rotate(logoRotation + (currAngle - c_angle));
     noStroke();
-    fill(60, 60, 192, 192);
+    if (checkForSuccess()) {
+        fill(60, 255, 192, 192);
+    } else {
+        fill(60, 60, 192, 192);
+    }
     rect(0, 0, logoZ, logoZ);
 
     // draw guide square at same translation
@@ -147,12 +151,12 @@ void scaffoldControlLogic()
         } else {
           c_angle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX); //The initial mouse rotation
           currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
-          //q_angle = logoRotation; //Initial box rotation  
+          //q_angle = logoRotation; //Initial box rotation
           refX = mouseX;
-          refY = mouseY;  
+          refY = mouseY;
           mouseRotandSize = true;
         }
-       
+
     }
 
     //left middle, move left
@@ -177,7 +181,6 @@ boolean mouseInLogoSquare(float adjMouseX, float adjMouseY) {
 
     float rotMouseX = cos(oppLogoRotRads) * mouseVecX - sin(oppLogoRotRads) * mouseVecY;
     float rotMouseY = sin(oppLogoRotRads) * mouseVecX + cos(oppLogoRotRads) * mouseVecY;
-    circle((width / 2) + logoX + rotMouseX,(height / 2) + logoY + rotMouseY, 5);
 
     return rotMouseX >= - 1.f * halfZ && rotMouseX <= halfZ && rotMouseY >= - 1.f * halfZ && rotMouseY <= halfZ;
 }
@@ -240,24 +243,24 @@ void mouseReleased()
   mouseFirstPressed = false;
   mouseMove = false;
   mouseRotandSize = false;
-    
+
   if (millis() - timeFirstClick <= 250){
     if (userDone==false && !checkForSuccess())
       errorCount++;
-  
+
     trialIndex++; //and move on to next trial
-  
+
     if (trialIndex==trialCount && userDone==false)
     {
       userDone = true;
       finishTime = millis();
     }
-    
+
     timeFirstClick = -1;
     return;
   }
   timeFirstClick = millis();
-  
+
   logoRotation -= c_angle - currAngle;
   c_angle = 0;
   currAngle = 0;
@@ -266,7 +269,7 @@ void mouseReleased()
 void mouseDragged(){
     if(mouseRotandSize){
       currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
-  
+
       logoZ += round(dist(mouseX, mouseY, logoX + width / 2, logoY + height / 2) - dist(refX, refY, logoX + width / 2, logoY + height/2));
       refX = mouseX;
       refY = mouseY;

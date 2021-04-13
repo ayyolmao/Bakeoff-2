@@ -104,6 +104,16 @@ void draw() {
     noStroke();
     fill(60, 60, 192, 192);
     rect(0, 0, logoZ, logoZ);
+
+    // draw guide square at same translation
+    Destination targetD = destinations.get(trialIndex);
+    rotate(radians(-logoRotation));
+    rotate(radians(targetD.rotation));
+    noFill();
+    stroke(204, 102, 0);
+    strokeWeight(1);
+    rect(0, 0, targetD.z, targetD.z);
+    noStroke();
     popMatrix();
 
     //===========DRAW EXAMPLE CONTROLS=================

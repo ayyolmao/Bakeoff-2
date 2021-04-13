@@ -19,6 +19,7 @@ final int screenPPI = 72; //what is the DPI of the screen you are using
 float dragOffsetX = 0;
 float dragOffsetY = 0;
 boolean mouseFirstPressed = false;
+boolean mouseMove = false;
 
 float logoX = 0;
 float logoY = 0;
@@ -138,16 +139,19 @@ void scaffoldControlLogic()
     float adjMouseX = mouseX - (width / 2);
     float adjMouseY = mouseY - (height / 2);
 
-    //left middle, move left
-    if (mousePressed && (mouseFirstPressed || mouseInLogoSquare(adjMouseX, adjMouseY))) {
-        if (!mouseFirstPressed) {
-            mouseFirstPressed = true;
+    if (mousePressed && !mouseFirstPressed) {
+        mouseFirstPressed = true;
+        if (mouseInLogoSquare(adjMouseX, adjMouseY)) {
+            mouseMove = true;
             dragOffsetX = adjMouseX - logoX;
             dragOffsetY = adjMouseY - logoY;
-        } else {
-            logoX = adjMouseX - dragOffsetX;
-            logoY = adjMouseY - dragOffsetY;
         }
+    }
+
+    //left middle, move left
+    if (mousePressed && mouseMove) {
+        logoX = adjMouseX - dragOffsetX;
+        logoY = adjMouseY - dragOffsetY;
     }
 }
 
@@ -176,19 +180,20 @@ void mouseReleased()
 {
     //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
     /* if (dist(width / 2, height / 2, mouseX, mouseY)<inchToPix(3f))
-     {
-     if (userDone == false && !checkForSuccess())
-         errorCount++;
+    {
+    if (userDone == false && !checkForSuccess())
+     errorCount++;
 
-     trialIndex++; //and move on to next trial
+    trialIndex++; //and move on to next trial
 
-     if (trialIndex == trialCount && userDone == false)
-     {
-         userDone = true;
-         finishTime = millis();
-     }
- } */
+    if (trialIndex == trialCount && userDone == false)
+    {
+     userDone = true;
+     finishTime = millis();
+ }
+} */
     mouseFirstPressed = false;
+    mouseMove = false;
 }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.

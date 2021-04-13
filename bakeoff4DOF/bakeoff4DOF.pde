@@ -20,6 +20,12 @@ float dragOffsetX = 0;
 float dragOffsetY = 0;
 boolean mouseFirstPressed = false;
 boolean mouseMove = false;
+boolean mouseRotandSize = false;
+float currAngle = 0;
+float c_angle = 0;
+int timeFirstClick = -1;
+float refX = 0;
+float refY = 0;
 
 float logoX = 0;
 float logoY = 0;
@@ -100,14 +106,14 @@ void draw() {
     pushMatrix();
     translate(width / 2, height / 2); //center the drawing coordinates to the center of the screen
     translate(logoX, logoY);
-    rotate(radians(logoRotation));
+    rotate(logoRotation + (currAngle - c_angle));
     noStroke();
     fill(60, 60, 192, 192);
     rect(0, 0, logoZ, logoZ);
 
     // draw guide square at same translation
     Destination targetD = destinations.get(trialIndex);
-    rotate(radians(-logoRotation));
+    rotate(-(logoRotation + (currAngle - c_angle)));
     rotate(radians(targetD.rotation));
     noFill();
     stroke(204, 102, 0);
@@ -126,26 +132,6 @@ void draw() {
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
-    //upper left corner, rotate counterclockwise
-    text("CCW", inchToPix(.4f), inchToPix(.4f));
-    if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
-        logoRotation--;
-
-    //upper right corner, rotate clockwise
-    text("CW", width - inchToPix(.4f), inchToPix(.4f));
-    if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
-        logoRotation++;
-
-    //lower left corner, decrease Z
-    text("-", inchToPix(.4f), height - inchToPix(.4f));
-    if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
-        logoZ = constrain(logoZ - inchToPix(.02f),.01, inchToPix(4f)); //leave min and max alone!
-
-    //lower right corner, increase Z
-    text("+", width - inchToPix(.4f), height - inchToPix(.4f));
-    if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
-        logoZ = constrain(logoZ + inchToPix(.02f),.01, inchToPix(4f)); //leave min and max alone!
-
     float adjMouseX = mouseX - (width / 2);
     float adjMouseY = mouseY - (height / 2);
 
@@ -158,13 +144,21 @@ void scaffoldControlLogic()
             mouseMove = true;
             dragOffsetX = adjMouseX - logoX;
             dragOffsetY = adjMouseY - logoY;
+        } else {
+          c_angle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX); //The initial mouse rotation
+          currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
+          //q_angle = logoRotation; //Initial box rotation  
+          refX = mouseX;
+          refY = mouseY;  
+          mouseRotandSize = true;
         }
+       
     }
 
     //left middle, move left
     if (mousePressed && mouseMove) {
-        logoX = adjMouseX - dragOffsetX;
-        logoY = adjMouseY - dragOffsetY;
+      logoX = adjMouseX - dragOffsetX;
+      logoY = adjMouseY - dragOffsetY;
     }
 }
 
@@ -223,6 +217,7 @@ void mousePressed()
         startTime = millis();
         println("time started!");
     }
+
 }
 
 
@@ -242,8 +237,40 @@ void mouseReleased()
     finishTime = millis();
 }
 } */
-    mouseFirstPressed = false;
-    mouseMove = false;
+  mouseFirstPressed = false;
+  mouseMove = false;
+  mouseRotandSize = false;
+    
+  if (millis() - timeFirstClick <= 250){
+    if (userDone==false && !checkForSuccess())
+      errorCount++;
+  
+    trialIndex++; //and move on to next trial
+  
+    if (trialIndex==trialCount && userDone==false)
+    {
+      userDone = true;
+      finishTime = millis();
+    }
+    
+    timeFirstClick = -1;
+    return;
+  }
+  timeFirstClick = millis();
+  
+  logoRotation -= c_angle - currAngle;
+  c_angle = 0;
+  currAngle = 0;
+}
+
+void mouseDragged(){
+    if(mouseRotandSize){
+      currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
+  
+      logoZ += round(dist(mouseX, mouseY, logoX + width / 2, logoY + height / 2) - dist(refX, refY, logoX + width / 2, logoY + height/2));
+      refX = mouseX;
+      refY = mouseY;
+    }
 }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
@@ -251,7 +278,7 @@ public boolean checkForSuccess()
 {
     Destination d = destinations.get(trialIndex);
     boolean closeDist = dist(d.x, d.y, logoX, logoY)<inchToPix(.05f); //has to be within +-0.05"
-    boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, logoRotation)<= 5;
+    boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, degrees(logoRotation))<= 5;
     boolean closeZ = abs(d.z - logoZ)<inchToPix(.05f); //has to be within +-0.05"
 
     println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY + ")");

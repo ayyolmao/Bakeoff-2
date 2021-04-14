@@ -123,7 +123,7 @@ void draw() {
     translate(logoX, logoY);
     rotate(logoRotation + (currAngle - c_angle));
     noStroke();
-    if (checkForSuccess()) {
+    if (checkSuccessNoPrint()) {
         fill(60, 255, 192, 192);
     } else {
         fill(60, 60, 192, 192);
@@ -314,7 +314,7 @@ public boolean checkForDistSuccess()
     // boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, degrees(logoRotation))<= 5;
     // boolean closeZ = abs(d.z - logoZ)<inchToPix(.05f); //has to be within +-0.05"
 
-    println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY + ")");
+    // println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY + ")");
     // println("Close Enough Rotation: " + closeRotation + " (rot dist=" + calculateDifferenceBetweenAngles(d.rotation, logoRotation) + ")");
     // println("Close Enough Z: " +  closeZ + " (logo Z = " + d.z + ", destination Z = " + logoZ + ")");
     // println("Close enough all: " + (closeDist && closeRotation && closeZ));
@@ -330,7 +330,7 @@ public boolean checkForRotationSuccess()
     // boolean closeZ = abs(d.z - logoZ)<inchToPix(.05f); //has to be within +-0.05"
 
     // println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY + ")");
-    println("Close Enough Rotation: " + closeRotation + " (rot dist=" + calculateDifferenceBetweenAngles(d.rotation, logoRotation) + ")");
+    // println("Close Enough Rotation: " + closeRotation + " (rot dist=" + calculateDifferenceBetweenAngles(d.rotation, logoRotation) + ")");
     // println("Close Enough Z: " +  closeZ + " (logo Z = " + d.z + ", destination Z = " + logoZ + ")");
     // println("Close enough all: " + (closeDist && closeRotation && closeZ));
 
@@ -346,10 +346,15 @@ public boolean checkForZSuccess()
 
     // println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY + ")");
     // println("Close Enough Rotation: " + closeRotation + " (rot dist=" + calculateDifferenceBetweenAngles(d.rotation, logoRotation) + ")");
-    println("Close Enough Z: " +  closeZ + " (logo Z = " + d.z + ", destination Z = " + logoZ + ")");
+    // println("Close Enough Z: " +  closeZ + " (logo Z = " + d.z + ", destination Z = " + logoZ + ")");
     // println("Close enough all: " + (closeDist && closeRotation && closeZ));
 
     return closeZ;
+}
+
+public boolean checkSuccessNoPrint()
+{
+  return checkForDistSuccess() && checkForRotationSuccess() && checkForZSuccess();
 }
 
 //utility function I include to calc diference between two angles

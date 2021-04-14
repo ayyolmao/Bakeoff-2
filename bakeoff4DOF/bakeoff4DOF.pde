@@ -286,6 +286,7 @@ void mouseDragged(){
       currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
 
       logoZ += round(dist(mouseX, mouseY, logoX + width / 2, logoY + height / 2) - dist(refX, refY, logoX + width / 2, logoY + height/2));
+      logoZ = constrain(logoZ, 0, logoZ);
       refX = mouseX;
       refY = mouseY;
     }
@@ -326,7 +327,7 @@ public boolean checkForRotationSuccess()
 {
     Destination d = destinations.get(trialIndex);
     // boolean closeDist = dist(d.x, d.y, logoX, logoY)<inchToPix(.05f); //has to be within +-0.05"
-    boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, degrees(logoRotation))<= 5;
+    boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, degrees(logoRotation + (currAngle - c_angle)))<= 5;
     // boolean closeZ = abs(d.z - logoZ)<inchToPix(.05f); //has to be within +-0.05"
 
     // println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY + ")");

@@ -104,30 +104,8 @@ void draw() {
         popMatrix();
     }
 
-    // DRAW TEXT THAT SAYS WHAT NEEDS CHANGING
-    String offTargetAttributes = "";
-
-    Destination targetD = destinations.get(trialIndex);
-    if (!checkForRotationSuccess()) {
-        int diff = (int) calculateDifferenceBetweenAngles(targetD.rotation, degrees(logoRotation + (currAngle - c_angle)));
-        textSize(15);
-        text("Rotate: " + diff + "°", logoX + width/2, logoY + height/2 - logoZ*3/4);
-    }
-    if (!checkForZSuccess()) {
-        int diff = (int) round(targetD.z - logoZ);
-        String change = "";
-        if (diff < 0)
-          change = "Decrease";
-        else if (diff > 0)
-          change = "Increase";
-        
-        text("Scale: " + change + " size", logoX + width/2, logoY + height/2 - logoZ*3/4 - 25);
-
-    }
-    if (offTargetAttributes.length() > 0) {
-    }
-
     //===========DRAW LOGO SQUARE=================
+    Destination targetD = destinations.get(trialIndex);
 
     pushMatrix();
     translate(width / 2, height / 2); //center the drawing coordinates to the center of the screen

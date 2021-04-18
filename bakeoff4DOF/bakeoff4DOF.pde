@@ -23,7 +23,7 @@ boolean mouseMove = false;
 boolean mouseRotandSize = false;
 float currAngle = 0;
 float c_angle = 0;
-int timeFirstClick = -1;
+int timeFirstClick = - 1;
 float refX = 0;
 float refY = 0;
 
@@ -31,6 +31,8 @@ float logoX = 0;
 float logoY = 0;
 float logoZ = 50f;
 float logoRotation = 0;
+
+color successGreen = color(60, 255, 50, 255);
 
 private class Destination
 {
@@ -54,8 +56,8 @@ void setup() {
     for (int i = 0; i < trialCount; i++) //don't change this!
         {
         Destination d = new Destination();
-        d.x = random(- width / 2 + border, width / 2 - border); //set a random x with some padding
-        d.y = random(- height / 2 + border, height / 2 - border); //set a random y with some padding
+        d.x = random( - width / 2 + border, width / 2 - border); //set a random x with some padding
+        d.y = random( - height / 2 + border, height / 2 - border); //set a random y with some padding
         d.rotation = random(0, 360); //random rotation between 0 and 360
         int j = (int)random(20);
         d.z = ((j % 12) + 1) * inchToPix(.25f); //increasing size from .25 up to 3.0"
@@ -118,26 +120,49 @@ void draw() {
     }
 
     //===========DRAW LOGO SQUARE=================
+    Destination targetD = destinations.get(trialIndex);
+
     pushMatrix();
     translate(width / 2, height / 2); //center the drawing coordinates to the center of the screen
     translate(logoX, logoY);
-    rotate(logoRotation + (currAngle - c_angle));
-    noStroke();
-    if (checkSuccessNoPrint()) {
-        fill(60, 255, 192, 192);
-    } else {
-        fill(60, 60, 192, 192);
-    }
-    rect(0, 0, logoZ, logoZ);
 
-    // draw guide square at same translation
-    Destination targetD = destinations.get(trialIndex);
-    rotate(-(logoRotation + (currAngle - c_angle)));
-    rotate(radians(targetD.rotation));
+    // check if we need to rotate
+    rotate(radians(getClosestTargetRot(targetD.rotation)));
+    float globalX = screenX(logoZ + 50, logoZ + 50);
+    float globalY = screenY(logoZ + 50, logoZ + 50);
+    if ((globalX > width || globalX < 0) || (globalY > height || globalY < 0)) {
+        logoRotation += PI / 2;
+        println("rotating");
+    }
+    rotate(- radians(getClosestTargetRot(targetD.rotation)));
+
+
+    rotate(logoRotation + (currAngle - c_angle));
+
+    noStroke();
+
+    // color using x/y coords
+    fill(getLogoSquareColor(targetD));
+
+    rect(0, 0, logoZ, logoZ);
+    stroke(getHandleColor(getClosestTargetRot(targetD.rotation)));
+    strokeWeight(3);
+    line(logoZ / 2, logoZ / 2, logoZ + 100, logoZ + 100);
     noFill();
-    stroke(204, 102, 0);
+    circle(logoZ + 50, logoZ + 50, 30);
+
+    //===========DRAW GUIDE SQUARE=================
+    rotate( - (logoRotation + (currAngle - c_angle)));
+
+    // println("targetD.rotation: " + targetD.rotation);
+    rotate(radians(getClosestTargetRot(targetD.rotation)));
+    noFill();
+    stroke(204, 102, 0, 255);
     strokeWeight(1);
     rect(0, 0, targetD.z, targetD.z);
+    line(targetD.z / 2, targetD.z / 2, targetD.z + 50, targetD.z + 50);
+    fill(204, 102, 0, 192);
+    circle(targetD.z + 50, targetD.z + 50, 20);
     noStroke();
     popMatrix();
 
@@ -146,6 +171,61 @@ void draw() {
 
     scaffoldControlLogic(); //you are going to want to replace this!
     text("Trial " + (trialIndex + 1) + " of " + trialCount, width / 2, inchToPix(.8f));
+}
+
+float getClosestTargetRot(float targetDRotation) {
+    // calculate closest 90 degree target rotation
+    float closestTargetRot = targetDRotation;
+    for (int i = 0; i < 4; i++) {
+        float temp = targetDRotation + (i * 90);
+        if (angleDistance(degrees(logoRotation), temp) < angleDistance(degrees(logoRotation), closestTargetRot)) {
+            closestTargetRot = temp;
+        }
+    }
+    return closestTargetRot;
+}
+
+float angleDistance(float deg1, float deg2) {
+    float phi = abs(deg1 - deg2) % 360;
+    float distance = phi > 180 ? 360 - phi : phi;
+    return distance;
+}
+
+color getHandleColor(float targetDRotation) {
+    // from: white
+    color from = color(255, 255, 255, 255);
+    // to: blue
+    color to = color(60, 60, 255, 255);
+    // println("check");
+    float logRot = logoRotation + (currAngle - c_angle);
+    // println("logoRotation: " + degrees(logoRotation + (currAngle - c_angle)));
+    if (checkForRotationSuccess() && checkForZSuccess()) {
+        return successGreen;
+    }
+    float degDiff = (float)calculateDifferenceBetweenAngles(targetDRotation, degrees(logRot));
+    float percentageDiff = map(degDiff, 0, 45, 1, 0);
+    // float blueLerp = map(percentageDiff, 0.f, 1.f, 255, 100);
+    // float redLerp = map(percentageDiff, 0.f, 1.f, 255, 60);
+    // println("closestTargetRotation: " + targetDRotation);
+    // println("degDiff: " + degDiff);
+    // println("percentageDiff: " + percentageDiff);
+    return lerpColor(from, to, percentageDiff);
+    // return color(redLerp, blueLerp, 255, 255);
+}
+
+color getLogoSquareColor(Destination targetDest) {
+    // from: white
+    color from = color(255, 255, 255, 190);
+    // to: blue
+    color to = color(60, 60, 255, 190);
+    if (checkForDistSuccess()) {
+        return successGreen;
+    }
+    float distDiff = dist(targetDest.x, targetDest.y, logoX, logoY);
+    float percentageDiff = map(distDiff, 0, 1000, 1, 0);
+    // println("distDiff: " + distDiff);
+    // println("percentageDiff: " + percentageDiff);
+    return lerpColor(from, to, percentageDiff);
 }
 
 //my example design for control, which is terrible
@@ -164,20 +244,20 @@ void scaffoldControlLogic()
             dragOffsetX = adjMouseX - logoX;
             dragOffsetY = adjMouseY - logoY;
         } else {
-          c_angle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX); //The initial mouse rotation
-          currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
-          //q_angle = logoRotation; //Initial box rotation
-          refX = mouseX;
-          refY = mouseY;
-          mouseRotandSize = true;
+            c_angle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX); //The initial mouse rotation
+            currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
+            //q_angle = logoRotation; //Initial box rotation
+            refX = mouseX;
+            refY = mouseY;
+            mouseRotandSize = true;
         }
 
     }
 
     //left middle, move left
     if (mousePressed && mouseMove) {
-      logoX = adjMouseX - dragOffsetX;
-      logoY = adjMouseY - dragOffsetY;
+        logoX = adjMouseX - dragOffsetX;
+        logoY = adjMouseY - dragOffsetY;
     }
 }
 
@@ -191,7 +271,7 @@ boolean mouseInLogoSquare(float adjMouseX, float adjMouseY) {
     float mouseVecX = adjMouseX - logoX;
     float mouseVecY = adjMouseY - logoY;
 
-    float oppLogoRotRads = - radians(logoRotation);
+    float oppLogoRotRads = - logoRotation;
     // println("logoRotation: " + logoRotation);
 
     float rotMouseX = cos(oppLogoRotRads) * mouseVecX - sin(oppLogoRotRads) * mouseVecY;
@@ -209,19 +289,19 @@ void visualizeMousePoint() {
     float mouseVecX = adjMouseX - logoX;
     float mouseVecY = adjMouseY - logoY;
 
-    float oppLogoRotRads = - radians(logoRotation);
+    float oppLogoRotRads = - logoRotation;
 
     float rotMouseX = cos(oppLogoRotRads) * mouseVecX - sin(oppLogoRotRads) * mouseVecY;
     float rotMouseY = sin(oppLogoRotRads) * mouseVecX + cos(oppLogoRotRads) * mouseVecY;
     circle(width / 2 + logoX + rotMouseX, height / 2 + logoY + rotMouseY, 5);
 
     println("rot mouse: (" + rotMouseX + ", " + rotMouseY + ")");
-    println("logoZ:     [" + ( - 1.f * halfZ) + ", " + halfZ + "]");
+    println("logoZ:     [" + (- 1.f * halfZ) + ", " + halfZ + "]");
 
     pushMatrix();
     translate(width / 2, height / 2); //center the drawing coordinates to the center of the screen
     translate(logoX, logoY);
-    // rotate(radians(logoRotation));
+    // rotate(logoRotation);
     noStroke();
     fill(255, 0, 0, 100);
     rect(0, 0, logoZ, logoZ);
@@ -255,40 +335,40 @@ void mouseReleased()
     finishTime = millis();
 }
 } */
-  mouseFirstPressed = false;
-  mouseMove = false;
-  mouseRotandSize = false;
+    mouseFirstPressed = false;
+    mouseMove = false;
+    mouseRotandSize = false;
 
-  if (millis() - timeFirstClick <= 250){
-    if (userDone==false && !checkForSuccess())
-      errorCount++;
+    if(millis() - timeFirstClick <= 250) {
+        if (userDone == false && !checkForSuccess())
+            errorCount++;
 
-    trialIndex++; //and move on to next trial
+        trialIndex++; //and move on to next trial
 
-    if (trialIndex==trialCount && userDone==false)
-    {
-      userDone = true;
-      finishTime = millis();
+        if (trialIndex == trialCount && userDone == false)
+        {
+            userDone = true;
+            finishTime = millis();
+        }
+
+        timeFirstClick = - 1;
+        return;
     }
+    timeFirstClick = millis();
 
-    timeFirstClick = -1;
-    return;
-  }
-  timeFirstClick = millis();
-
-  logoRotation -= c_angle - currAngle;
-  c_angle = 0;
-  currAngle = 0;
+    logoRotation -= c_angle - currAngle;
+    c_angle = 0;
+    currAngle = 0;
 }
 
-void mouseDragged(){
-    if(mouseRotandSize){
-      currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
+void mouseDragged() {
+    if (mouseRotandSize) {
+        currAngle = atan2(mouseY - height / 2 - logoY, mouseX - width / 2 - logoX);
 
-      logoZ += round(dist(mouseX, mouseY, logoX + width / 2, logoY + height / 2) - dist(refX, refY, logoX + width / 2, logoY + height/2));
-      logoZ = constrain(logoZ, 0, logoZ);
-      refX = mouseX;
-      refY = mouseY;
+        logoZ += round(dist(mouseX, mouseY, logoX + width / 2, logoY + height / 2) - dist(refX, refY, logoX + width / 2, logoY + height / 2));
+        logoZ = constrain(logoZ, 0, logoZ);
+        refX = mouseX;
+        refY = mouseY;
     }
 }
 
@@ -355,7 +435,7 @@ public boolean checkForZSuccess()
 
 public boolean checkSuccessNoPrint()
 {
-  return checkForDistSuccess() && checkForRotationSuccess() && checkForZSuccess();
+    return checkForDistSuccess() && checkForRotationSuccess() && checkForZSuccess();
 }
 
 //utility function I include to calc diference between two angles

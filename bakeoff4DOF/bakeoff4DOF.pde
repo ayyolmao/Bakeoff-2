@@ -38,6 +38,11 @@ float handleLength = 70;
 color successGreen = color(60, 255, 50, 255);
 
 Sound s;
+// TRY CHANGING THESE
+float amplitude = 150;
+float defaultVolume = 0.1;
+float halfCorrectVolume = 0.5;
+float fullCorrectVolume = 1.0;
 
 private class Destination
 {
@@ -71,7 +76,7 @@ void setup() {
     }
 
     SinOsc sin = new SinOsc(this);
-    sin.play(150, 0.5);
+    sin.play(amplitude, 0.5);
 
     s = new Sound(this);
     s.volume(0.1);
@@ -141,13 +146,13 @@ void draw() {
 
     // sound feedback
     if (checkSuccessNoPrint()) {
-        s.volume(1.0);
+        s.volume(fullCorrectVolume);
     } else if (checkForRotationSuccess() && checkForZSuccess()) {
-        s.volume(0.3);
+        s.volume(halfCorrectVolume);
     } else if (checkForDistSuccess()) {
-        s.volume(0.3);
+        s.volume(halfCorrectVolume);
     } else {
-        s.volume(0.1);
+        s.volume(defaultVolume);
     }
 
 

@@ -34,7 +34,7 @@ float logoRotation = 0;
 
 float dragCircleRadius = 100;
 
-float handleLength = 100;
+float handleLength = 70;
 
 color successGreen = color(60, 255, 50, 255);
 

@@ -123,6 +123,10 @@ void draw() {
 
 
     rotate(logoRotation + (currAngle - c_angle));
+    
+    
+
+
 
     noStroke();
 
@@ -132,9 +136,10 @@ void draw() {
     rect(0, 0, logoZ, logoZ);
     stroke(getHandleColor(getClosestTargetRot(targetD.rotation)));
     strokeWeight(3);
-    line(logoZ / 2, logoZ / 2, logoZ + 100, logoZ + 100);
+    line(logoZ / 2, logoZ / 2, logoZ + 50 - 12, logoZ + 50 - 12);
     noFill();
     circle(logoZ + 50, logoZ + 50, 30);
+    line(logoZ + 50 + 12, logoZ + 50 + 12, logoZ + 100, logoZ + 100);
 
     //===========DRAW GUIDE SQUARE=================
     rotate( - (logoRotation + (currAngle - c_angle)));
@@ -145,7 +150,7 @@ void draw() {
     stroke(204, 102, 0, 255);
     strokeWeight(1);
     rect(0, 0, targetD.z, targetD.z);
-    line(targetD.z / 2, targetD.z / 2, targetD.z + 50, targetD.z + 50);
+    //line(targetD.z / 2, targetD.z / 2, targetD.z + 50, targetD.z + 50);
     fill(204, 102, 0, 192);
     circle(targetD.z + 50, targetD.z + 50, 20);
     noStroke();
@@ -218,10 +223,15 @@ void scaffoldControlLogic()
 {
     float adjMouseX = mouseX - (width / 2);
     float adjMouseY = mouseY - (height / 2);
+    
+    if(!checkForZSuccess() || !checkForRotationSuccess()){
+        text("SCALE", logoX + width/2, logoY + height/2 - logoZ/2 - 20);
+    } else {
+        text("DRAG", logoX + width/2, logoY + height/2 - logoZ/2 - 20);
+    }
 
     // visualizeMousePoint();
     // println("mouseInLogoSquare: " + mouseInLogoSquare(adjMouseX, adjMouseY));
-
     if (mousePressed && !mouseFirstPressed) {
         mouseFirstPressed = true;
         if (mouseInLogoSquare(adjMouseX, adjMouseY)) {

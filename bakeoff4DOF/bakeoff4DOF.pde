@@ -162,7 +162,7 @@ void draw() {
 
     strokeWeight(3);
     line(logoZ / 2, logoZ / 2, logoZ + handleLength - 12, logoZ + handleLength - 12);
-    color transparent_orange = color(204, 102, 0, 100);
+    color transparent_orange = color(204, 102, 0, 0);
     fill(transparent_orange);
     strokeWeight(8);
     circle(logoZ + handleLength, logoZ + handleLength, 37);

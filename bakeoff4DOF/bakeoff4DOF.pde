@@ -32,6 +32,10 @@ float logoY = 0;
 float logoZ = 50f;
 float logoRotation = 0;
 
+float dragCircleRadius = 100;
+
+float handleLength = 100;
+
 color successGreen = color(60, 255, 50, 255);
 
 private class Destination
@@ -115,7 +119,8 @@ void draw() {
     rotate(radians(getClosestTargetRot(targetD.rotation)));
     float globalX = screenX(logoZ + 50, logoZ + 50);
     float globalY = screenY(logoZ + 50, logoZ + 50);
-    if ((globalX > width || globalX < 0) || (globalY > height || globalY < 0)) {
+    float buffer = 60;
+    if ((globalX > width - buffer || globalX < buffer) || (globalY > height - buffer || globalY < buffer)) {
         logoRotation += PI / 2;
         println("rotating");
     }
@@ -123,8 +128,8 @@ void draw() {
 
 
     rotate(logoRotation + (currAngle - c_angle));
-    
-    
+
+
 
 
 
@@ -136,10 +141,17 @@ void draw() {
     rect(0, 0, logoZ, logoZ);
     stroke(getHandleColor(getClosestTargetRot(targetD.rotation)));
     strokeWeight(3);
-    line(logoZ / 2, logoZ / 2, logoZ + 50 - 12, logoZ + 50 - 12);
+    line(logoZ / 2, logoZ / 2, logoZ + handleLength - 12, logoZ + handleLength - 12);
     noFill();
-    circle(logoZ + 50, logoZ + 50, 30);
-    line(logoZ + 50 + 12, logoZ + 50 + 12, logoZ + 100, logoZ + 100);
+    circle(logoZ + handleLength, logoZ + handleLength, 30);
+    line(logoZ + handleLength + 12, logoZ + handleLength + 12, logoZ + handleLength + 50, logoZ + handleLength + 50);
+
+    //===========DRAW DRAG CIRCLE=================
+    if (logoZ < dragCircleRadius - 20){
+        fill(255,255,255,30);
+        noStroke();
+        circle(0,0,dragCircleRadius);
+    }
 
     //===========DRAW GUIDE SQUARE=================
     rotate( - (logoRotation + (currAngle - c_angle)));
@@ -152,7 +164,7 @@ void draw() {
     rect(0, 0, targetD.z, targetD.z);
     //line(targetD.z / 2, targetD.z / 2, targetD.z + 50, targetD.z + 50);
     fill(204, 102, 0, 192);
-    circle(targetD.z + 50, targetD.z + 50, 20);
+    circle(targetD.z + handleLength, targetD.z + handleLength, 20);
     noStroke();
     popMatrix();
 
@@ -223,7 +235,7 @@ void scaffoldControlLogic()
 {
     float adjMouseX = mouseX - (width / 2);
     float adjMouseY = mouseY - (height / 2);
-    
+
     if(!checkForZSuccess() || !checkForRotationSuccess()){
         text("SCALE", logoX + width/2, logoY + height/2 - logoZ/2 - 20);
     } else {
@@ -234,7 +246,7 @@ void scaffoldControlLogic()
     // println("mouseInLogoSquare: " + mouseInLogoSquare(adjMouseX, adjMouseY));
     if (mousePressed && !mouseFirstPressed) {
         mouseFirstPressed = true;
-        if (mouseInLogoSquare(adjMouseX, adjMouseY)) {
+        if (isDragClick(adjMouseX, adjMouseY)) {
             mouseMove = true;
             dragOffsetX = adjMouseX - logoX;
             dragOffsetY = adjMouseY - logoY;
@@ -256,6 +268,10 @@ void scaffoldControlLogic()
     }
 }
 
+boolean isDragClick(float adjMouseX, float adjMouseY) {
+    return mouseInLogoSquare(adjMouseX, adjMouseY) || mouseInDragCircle(adjMouseX, adjMouseY);
+}
+
 boolean mouseInLogoSquare(float adjMouseX, float adjMouseY) {
     // println("logo:        (" + logoX + ", " + logoY + ")");
     // println("logoZ:       " + -1.f * halfZ);
@@ -273,6 +289,10 @@ boolean mouseInLogoSquare(float adjMouseX, float adjMouseY) {
     float rotMouseY = sin(oppLogoRotRads) * mouseVecX + cos(oppLogoRotRads) * mouseVecY;
 
     return rotMouseX >= - 1.f * halfZ && rotMouseX <= halfZ && rotMouseY >= - 1.f * halfZ && rotMouseY <= halfZ;
+}
+
+boolean mouseInDragCircle(float adjMouseX, float adjMouseY) {
+    return dist(adjMouseX, adjMouseY, logoX, logoY) < dragCircleRadius;
 }
 
 void visualizeMousePoint() {

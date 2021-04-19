@@ -71,7 +71,7 @@ void setup() {
     }
 
     SinOsc sin = new SinOsc(this);
-    sin.play(200, 0.5);
+    sin.play(150, 0.5);
 
     s = new Sound(this);
     s.volume(0.1);
@@ -125,9 +125,11 @@ void draw() {
 
     // check if we need to rotate
     rotate(radians(getClosestTargetRot(targetD.rotation)));
-    float globalX = screenX(logoZ + 50, logoZ + 50);
-    float globalY = screenY(logoZ + 50, logoZ + 50);
-    float buffer = 60;
+    float globalX = screenX(targetD.z + handleLength, targetD.z + handleLength);
+    float globalY = screenY(targetD.z + handleLength, targetD.z + handleLength);
+    float buffer = 30;
+    println("globalX:" + globalX);
+    println("globalY:" + globalY);
     if ((globalX > width - buffer || globalX < buffer) || (globalY > height - buffer || globalY < buffer)) {
         logoRotation += PI / 2;
         println("rotating");
@@ -161,8 +163,15 @@ void draw() {
     strokeWeight(3);
     line(logoZ / 2, logoZ / 2, logoZ + handleLength - 12, logoZ + handleLength - 12);
     noFill();
-    circle(logoZ + handleLength, logoZ + handleLength, 30);
+    strokeWeight(8);
+    circle(logoZ + handleLength, logoZ + handleLength, 37);
+    strokeWeight(3);
     line(logoZ + handleLength + 12, logoZ + handleLength + 12, logoZ + handleLength + 50, logoZ + handleLength + 50);
+
+    // draw faded handle knob
+    fill(255,255,255,20);
+    noStroke();
+    circle(logoZ + handleLength + 75, logoZ + handleLength + 75, 75);
 
     //===========DRAW DRAG CIRCLE=================
     if (logoZ < dragCircleRadius - 20) {

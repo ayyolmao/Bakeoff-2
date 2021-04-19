@@ -162,7 +162,8 @@ void draw() {
 
     strokeWeight(3);
     line(logoZ / 2, logoZ / 2, logoZ + handleLength - 12, logoZ + handleLength - 12);
-    noFill();
+    color transparent_orange = color(204, 102, 0, 100);
+    fill(transparent_orange);
     strokeWeight(8);
     circle(logoZ + handleLength, logoZ + handleLength, 37);
     strokeWeight(3);
@@ -190,7 +191,8 @@ void draw() {
     strokeWeight(1);
     rect(0, 0, targetD.z, targetD.z);
     //line(targetD.z / 2, targetD.z / 2, targetD.z + 50, targetD.z + 50);
-    fill(204, 102, 0, 192);
+    color orange = color(204, 102, 0, 192);
+    fill(orange);
     circle(targetD.z + handleLength, targetD.z + handleLength, 20);
     noStroke();
     popMatrix();

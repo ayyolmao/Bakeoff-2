@@ -169,9 +169,9 @@ void draw() {
     line(logoZ + handleLength + 12, logoZ + handleLength + 12, logoZ + handleLength + 50, logoZ + handleLength + 50);
 
     // draw faded handle knob
-    fill(255,255,255,20);
-    noStroke();
-    circle(logoZ + handleLength + 75, logoZ + handleLength + 75, 75);
+    // fill(255,255,255,20);
+    // noStroke();
+    // circle(logoZ + handleLength + 75, logoZ + handleLength + 75, 75);
 
     //===========DRAW DRAG CIRCLE=================
     if (logoZ < dragCircleRadius - 20) {

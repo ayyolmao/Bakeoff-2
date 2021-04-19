@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import processing.sound.*;
 
 //these are variables you should probably leave alone
 int index = 0;             //starts at zero-ith trial
@@ -33,10 +34,10 @@ float logoZ = 50f;
 float logoRotation = 0;
 
 float dragCircleRadius = 100;
-
 float handleLength = 70;
-
 color successGreen = color(60, 255, 50, 255);
+
+Sound s;
 
 private class Destination
 {
@@ -60,14 +61,20 @@ void setup() {
     for (int i = 0; i < trialCount; i++) //don't change this!
         {
         Destination d = new Destination();
-        d.x = random( - width / 2 + border, width / 2 - border); //set a random x with some padding
-        d.y = random( - height / 2 + border, height / 2 - border); //set a random y with some padding
+        d.x = random(- width / 2 + border, width / 2 - border); //set a random x with some padding
+        d.y = random(- height / 2 + border, height / 2 - border); //set a random y with some padding
         d.rotation = random(0, 360); //random rotation between 0 and 360
         int j = (int)random(20);
         d.z = ((j % 12) + 1) * inchToPix(.25f); //increasing size from .25 up to 3.0"
         destinations.add(d);
         println("created target with " + d.x + "," + d.y + "," + d.rotation + "," + d.z);
     }
+
+    SinOsc sin = new SinOsc(this);
+    sin.play(200, 0.5);
+
+    s = new Sound(this);
+    s.volume(0.1);
 
     Collections.shuffle(destinations); // randomize the order of the button; don't change this.
 }
@@ -83,6 +90,7 @@ void draw() {
     //shouldn't really modify this printout code unless there is a really good reason to
     if (userDone)
         {
+            s.volume(0);
         text("User completed " + trialCount + " trials", width / 2, inchToPix(.4f));
         text("User had " + errorCount + " error(s)", width / 2, inchToPix(.4f) * 2);
         text("User took " + (finishTime - startTime) / 1000f / trialCount + " sec per destination", width / 2, inchToPix(.4f) * 3);
@@ -124,12 +132,21 @@ void draw() {
         logoRotation += PI / 2;
         println("rotating");
     }
-    rotate(- radians(getClosestTargetRot(targetD.rotation)));
+    rotate( - radians(getClosestTargetRot(targetD.rotation)));
 
 
     rotate(logoRotation + (currAngle - c_angle));
 
-
+    // sound feedback
+    if (checkSuccessNoPrint()) {
+        s.volume(1.0);
+    } else if (checkForRotationSuccess() && checkForZSuccess()) {
+        s.volume(0.3);
+    } else if (checkForDistSuccess()) {
+        s.volume(0.3);
+    } else {
+        s.volume(0.1);
+    }
 
 
 
@@ -140,6 +157,7 @@ void draw() {
 
     rect(0, 0, logoZ, logoZ);
     stroke(getHandleColor(getClosestTargetRot(targetD.rotation)));
+
     strokeWeight(3);
     line(logoZ / 2, logoZ / 2, logoZ + handleLength - 12, logoZ + handleLength - 12);
     noFill();
@@ -147,14 +165,14 @@ void draw() {
     line(logoZ + handleLength + 12, logoZ + handleLength + 12, logoZ + handleLength + 50, logoZ + handleLength + 50);
 
     //===========DRAW DRAG CIRCLE=================
-    if (logoZ < dragCircleRadius - 20){
+    if (logoZ < dragCircleRadius - 20) {
         fill(255,255,255,30);
         noStroke();
         circle(0,0,dragCircleRadius);
     }
 
     //===========DRAW GUIDE SQUARE=================
-    rotate( - (logoRotation + (currAngle - c_angle)));
+    rotate(- (logoRotation + (currAngle - c_angle)));
 
     // println("targetD.rotation: " + targetD.rotation);
     rotate(radians(getClosestTargetRot(targetD.rotation)));
@@ -236,10 +254,10 @@ void scaffoldControlLogic()
     float adjMouseX = mouseX - (width / 2);
     float adjMouseY = mouseY - (height / 2);
 
-    if(!checkForZSuccess() || !checkForRotationSuccess()){
-        text("SCALE", logoX + width/2, logoY + height/2 - logoZ/2 - 20);
+    if (!checkForZSuccess() || !checkForRotationSuccess()) {
+        text("SCALE", logoX + width / 2, logoY + height / 2 - logoZ / 2 - 20);
     } else {
-        text("DRAG", logoX + width/2, logoY + height/2 - logoZ/2 - 20);
+        text("DRAG", logoX + width / 2, logoY + height / 2 - logoZ / 2 - 20);
     }
 
     // visualizeMousePoint();
@@ -311,7 +329,7 @@ void visualizeMousePoint() {
     circle(width / 2 + logoX + rotMouseX, height / 2 + logoY + rotMouseY, 5);
 
     println("rot mouse: (" + rotMouseX + ", " + rotMouseY + ")");
-    println("logoZ:     [" + (- 1.f * halfZ) + ", " + halfZ + "]");
+    println("logoZ:     [" + ( - 1.f * halfZ) + ", " + halfZ + "]");
 
     pushMatrix();
     translate(width / 2, height / 2); //center the drawing coordinates to the center of the screen
@@ -353,7 +371,7 @@ void mouseReleased()
     mouseFirstPressed = false;
     mouseRotandSize = false;
 
-    if(mouseMove) {
+    if (mouseMove) {
         mouseMove = false;
         if (userDone == false && !checkForSuccess())
             errorCount++;

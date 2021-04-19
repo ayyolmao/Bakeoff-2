@@ -195,7 +195,7 @@ void draw() {
     noFill();
     stroke(204, 102, 0, 255);
     strokeWeight(1);
-    rect(0, 0, targetD.z, targetD.z);
+    // rect(0, 0, targetD.z, targetD.z);
     //line(targetD.z / 2, targetD.z / 2, targetD.z + 50, targetD.z + 50);
     color orange = color(204, 102, 0, 192);
     fill(orange);

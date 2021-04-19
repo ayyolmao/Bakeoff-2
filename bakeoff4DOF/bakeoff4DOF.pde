@@ -128,8 +128,8 @@ void draw() {
     float globalX = screenX(targetD.z + handleLength, targetD.z + handleLength);
     float globalY = screenY(targetD.z + handleLength, targetD.z + handleLength);
     float buffer = 30;
-    println("globalX:" + globalX);
-    println("globalY:" + globalY);
+    //println("globalX:" + globalX);
+    //println("globalY:" + globalY);
     if ((globalX > width - buffer || globalX < buffer) || (globalY > height - buffer || globalY < buffer)) {
         logoRotation += PI / 2;
         println("rotating");
@@ -165,7 +165,7 @@ void draw() {
     color transparent_orange = color(204, 102, 0, 0);
     fill(transparent_orange);
     strokeWeight(8);
-    circle(logoZ + handleLength, logoZ + handleLength, 37);
+    circle(logoZ + handleLength, logoZ + handleLength, 30);
     strokeWeight(3);
     line(logoZ + handleLength + 12, logoZ + handleLength + 12, logoZ + handleLength + 50, logoZ + handleLength + 50);
 

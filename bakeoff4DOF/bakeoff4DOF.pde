@@ -39,7 +39,8 @@ color successGreen = color(60, 255, 50, 255);
 
 Sound s;
 // TRY CHANGING THESE
-float amplitude = 150;
+float frequency = 150;
+float amplitude = 0.5;
 float defaultVolume = 0.1;
 float halfCorrectVolume = 0.5;
 float fullCorrectVolume = 1.0;
@@ -76,7 +77,7 @@ void setup() {
     }
 
     SinOsc sin = new SinOsc(this);
-    sin.play(amplitude, 0.5);
+    sin.play(frequency, amplitude);
 
     s = new Sound(this);
     s.volume(0.1);
